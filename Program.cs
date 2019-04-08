@@ -1,6 +1,5 @@
 using System;
 using System.IO;
-using brab.Alice;
 
 class Program
 {
@@ -60,7 +59,8 @@ class Program
             "/home/boris/droneMov/falafel_low/chunk1_tst/1200.jpg",
         };
     }
-    static void Main(string[] args)
+
+    static void MakeMeshroomJson()
     {
         string[] imgs = new string[]
         {
@@ -87,6 +87,23 @@ class Program
 
         Console.WriteLine("{0}", graph.Dumps());
         graph.WriteToFile("/home/boris/droneMov/falafel_low/chunk1_tst/auto.mg");
+    }
+
+    static void SplitProgress(float done)
+    {
+Console.WriteLine("split done {0}", done);
+    }
+
+    static void Main(string[] args)
+    {
+        //MakeMeshroomJson();
+        var frames = PrepVideo.SplitFrames(
+            "/usr/bin/ffmpeg",
+            //"/home/boris/droneMov/valkarra_sunny.mov",
+            "/home/boris/droneMov/falafel_low.mov",
+            SplitProgress);
+
+Console.WriteLine("done spliting hairs, {0} frmes", frames);
     }
 }
 

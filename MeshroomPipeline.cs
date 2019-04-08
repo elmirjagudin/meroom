@@ -2,9 +2,6 @@ using System.IO;
 using System.Collections.Generic;
 using Newtonsoft.Json;
 
-namespace brab.Alice
-{
-
 #pragma warning disable 0649
 abstract class Node
 {
@@ -392,5 +389,3 @@ class PipelineJson
     }
 }
 #pragma warning restore
-
-}
