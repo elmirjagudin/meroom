@@ -96,14 +96,16 @@ Console.WriteLine("split done {0}", done);
 
     static void Main(string[] args)
     {
-        //MakeMeshroomJson();
-        var frames = PrepVideo.SplitFrames(
-            "/usr/bin/ffmpeg",
-            //"/home/boris/droneMov/valkarra_sunny.mov",
-            "/home/boris/droneMov/falafel_low.mov",
-            SplitProgress);
+        var ffmpegBin = "/usr/bin/ffmpeg";
+        //var videoFile = "/home/boris/droneMov/falafel_low.mov";
+        var videoFile = "/home/boris/droneMov/valkarra_sunny.mov";
 
+Console.WriteLine("video {0}", videoFile);
+
+        //MakeMeshroomJson();
+        var frames = PrepVideo.SplitFrames(ffmpegBin, videoFile, SplitProgress);
 Console.WriteLine("done spliting hairs, {0} frmes", frames);
+        PrepVideo.ExtractSubtitles(ffmpegBin, videoFile);
     }
 }
 

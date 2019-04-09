@@ -106,28 +106,61 @@ class FFMPEGOutputParser
 public class PrepVideo
 {
     const string DATA_DIR = "panopt";
+    const string POSITIONS_FILE = "positions.srt";
 
-    public static uint SplitFrames(string ffmpegBinary, string VideoFile, SplitProgress ProgressCB)
+    static string GetDestinationDir(string VideoFile)
     {
         var dirName = Path.GetDirectoryName(VideoFile);
         var fileName = Path.GetFileNameWithoutExtension(VideoFile);
 
-        var destDir = Path.Combine(dirName, DATA_DIR, fileName);
-        var frameTemplate = Path.Combine(destDir, "%04d.jpg");
+        return Path.Combine(dirName, DATA_DIR, fileName);
+    }
 
-        Directory.CreateDirectory(destDir);
-
+    static Process Run(string bin, params string[] args)
+    {
         var psi = new ProcessStartInfo();
-        psi.FileName = ffmpegBinary;
-        psi.WorkingDirectory = destDir;
-        psi.ArgumentList.Add("-i");
-        psi.ArgumentList.Add(VideoFile);
-        psi.ArgumentList.Add(frameTemplate);
+        psi.FileName = bin;
         psi.RedirectStandardError = true;
+
+        /* add process arguments */
+        foreach (var arg in args)
+        {
+            psi.ArgumentList.Add(arg);
+        }
 
         var proc = new Process();
         proc.StartInfo = psi;
 
+        proc.Start();
+
+        return proc;
+    }
+
+    public static void ExtractSubtitles(string ffmpegBinary, string VideoFile)
+    {
+        var destDir = GetDestinationDir(VideoFile);
+        var posFile = Path.Combine(destDir, POSITIONS_FILE);
+
+        var proc = Run(ffmpegBinary, "-y", "-i", VideoFile, posFile);
+
+        proc.WaitForExit();
+
+        var exitCode = proc.ExitCode;
+        if (exitCode != 0)
+        {
+            var err = string.Format("{0} failed, exit code {1}", ffmpegBinary, exitCode);
+            throw new Exception(err);
+        }
+    }
+
+    public static uint SplitFrames(string ffmpegBinary, string VideoFile, SplitProgress ProgressCB)
+    {
+        var destDir = GetDestinationDir(VideoFile);
+        var frameTemplate = Path.Combine(destDir, "%04d.jpg");
+
+        Directory.CreateDirectory(destDir);
+
+        var proc = Run(ffmpegBinary, "-i", VideoFile, frameTemplate);
         proc.Start();
 
         var oparser = new FFMPEGOutputParser(proc.StandardError, ProgressCB);
