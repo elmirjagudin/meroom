@@ -96,9 +96,10 @@ Console.WriteLine("split done {0}", done);
 
     static void Main(string[] args)
     {
+        var timeBase = new TimeBase { Numerator = 1001, Denominator = 30000 };
         var ffmpegBin = "/usr/bin/ffmpeg";
-        //var videoFile = "/home/boris/droneMov/falafel_low.mov";
-        var videoFile = "/home/boris/droneMov/valkarra_sunny.mov";
+        var videoFile = "/home/boris/droneMov/falafel_low.mov";
+        //var videoFile = "/home/boris/droneMov/valkarra_sunny.mov";
 
 Console.WriteLine("video {0}", videoFile);
 
@@ -106,6 +107,7 @@ Console.WriteLine("video {0}", videoFile);
         var frames = PrepVideo.SplitFrames(ffmpegBin, videoFile, SplitProgress);
 Console.WriteLine("done spliting hairs, {0} frmes", frames);
         PrepVideo.ExtractSubtitles(ffmpegBin, videoFile);
+        Chunks.DumpChunks(timeBase, frames);
     }
 }
 
