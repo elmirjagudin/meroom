@@ -30,7 +30,7 @@ public class Chunks
         }
     }
 
-    static IEnumerable<IEnumerable<uint>> GetChunks(TimeBase TimeBase, uint LastFrame)
+    public static IEnumerable<IEnumerable<uint>> GetChunks(TimeBase TimeBase, uint LastFrame)
     {
         var lastPTS = TimeBase.Numerator * (LastFrame - 1);
         var lastTimeStamp = (uint)((double)(lastPTS)/(double)TimeBase.Denominator * 1000.0);
@@ -42,17 +42,5 @@ public class Chunks
 
         yield return KeyFrames(lastTimeStamp - CHUNK_DURATION, lastTimeStamp, TimeBase);
 
-    }
-
-    public static void DumpChunks(TimeBase TimeBase, uint LastFrame)
-    {
-        foreach (var c in GetChunks(TimeBase, LastFrame))
-        {
-Console.WriteLine("c {0}", c);
-            foreach (var f in c)
-            {
-Console.WriteLine("f {0}", f);
-            }
-        }
     }
 }

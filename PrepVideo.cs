@@ -153,18 +153,19 @@ public class PrepVideo
         }
     }
 
-    public static uint SplitFrames(string ffmpegBinary, string VideoFile, SplitProgress ProgressCB)
+    public static void SplitFrames(string ffmpegBinary, string VideoFile, SplitProgress ProgressCB,
+                                   out uint NumFrames, out string ImagesDir)
     {
-        var destDir = GetDestinationDir(VideoFile);
-        var frameTemplate = Path.Combine(destDir, "%04d.jpg");
+        ImagesDir = GetDestinationDir(VideoFile);
+        var frameTemplate = Path.Combine(ImagesDir, "%04d.jpg");
 
-        Directory.CreateDirectory(destDir);
+        Directory.CreateDirectory(ImagesDir);
 
         var proc = Run(ffmpegBinary, "-i", VideoFile, frameTemplate);
         proc.Start();
 
         var oparser = new FFMPEGOutputParser(proc.StandardError, ProgressCB);
-        var NumFrames = oparser.ParseOutput();
+        NumFrames = oparser.ParseOutput();
 
         proc.WaitForExit();
         var exitCode = proc.ExitCode;
@@ -173,7 +174,5 @@ public class PrepVideo
             var err = string.Format("{0} failed, exit code {1}", ffmpegBinary, exitCode);
             throw new Exception(err);
         }
-
-        return NumFrames;
     }
 }

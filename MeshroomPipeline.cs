@@ -29,14 +29,14 @@ class CameraInit : Node
     const int INTRINSIC_ID = 1;
     const int MAGIC_LARGE_NUMBER = 60903726;
 
-    object[] GetViewpoints(string[] images)
+    List<object> GetViewpoints(IEnumerable<string> images)
     {
-        var views = new object[images.Length];
+        var views = new List<object>();
 
         uint i = 0;
         foreach (var img in images)
         {
-            views[i] = new
+            views.Add(new
             {
                 /*
                  * seems that view and pose ID must be 'large numbers',
@@ -50,7 +50,7 @@ class CameraInit : Node
                 rigId = -1,
                 subPoseId = -1,
                 metadata = "",
-            };
+            });
 
             i += 1;
         }
@@ -58,7 +58,7 @@ class CameraInit : Node
         return views;
     }
 
-    public CameraInit(double FocalLength, int Width, int Height, string[] Images,
+    public CameraInit(double FocalLength, int Width, int Height, IEnumerable<string> Images,
                       string SensorDatabase)
         : base("CameraInit", 0, 50, 1)
     {
@@ -358,7 +358,7 @@ class PipelineJson
 
     public Dictionary<string, Node> graph = new Dictionary<string, Node>();
 
-    public PipelineJson(double FocalLength, int Width, int Height, string[] Images,
+    public PipelineJson(double FocalLength, int Width, int Height, IEnumerable<string> Images,
                         string SensorDatabase, string VocTree,
                         bool CreateMesh = false)
     {
