@@ -1,6 +1,5 @@
 using System;
 using System.IO;
-using System.Diagnostics;
 using System.Globalization;
 using System.Text.RegularExpressions;
 
@@ -116,32 +115,12 @@ public class PrepVideo
         return Path.Combine(dirName, DATA_DIR, fileName);
     }
 
-    static Process Run(string bin, params string[] args)
-    {
-        var psi = new ProcessStartInfo();
-        psi.FileName = bin;
-        psi.RedirectStandardError = true;
-
-        /* add process arguments */
-        foreach (var arg in args)
-        {
-            psi.ArgumentList.Add(arg);
-        }
-
-        var proc = new Process();
-        proc.StartInfo = psi;
-
-        proc.Start();
-
-        return proc;
-    }
-
     public static void ExtractSubtitles(string ffmpegBinary, string VideoFile)
     {
         var destDir = GetDestinationDir(VideoFile);
         var posFile = Path.Combine(destDir, POSITIONS_FILE);
 
-        var proc = Run(ffmpegBinary, "-y", "-i", VideoFile, posFile);
+        var proc = Utils.Run(ffmpegBinary, "-y", "-i", VideoFile, posFile);
 
         proc.WaitForExit();
 
@@ -161,7 +140,7 @@ public class PrepVideo
 
         Directory.CreateDirectory(ImagesDir);
 
-        var proc = Run(ffmpegBinary, "-i", VideoFile, frameTemplate);
+        var proc = Utils.Run(ffmpegBinary, "-i", VideoFile, frameTemplate);
         proc.Start();
 
         var oparser = new FFMPEGOutputParser(proc.StandardError, ProgressCB);

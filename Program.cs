@@ -1,37 +1,17 @@
 using System;
-using System.IO;
-using System.Collections.Generic;
+
 
 class Program
 {
-    static IEnumerable<string> Images(string ImgsDir, IEnumerable<uint> frameNums)
-    {
-        foreach (var frame in frameNums)
-        {
-            var fname = string.Format("{0:D4}.jpg", frame);
-            yield return Path.Combine(ImgsDir, fname);
-        }
-    }
-
-    static void MakeMeshroomGraphs(string ImagesDir, IEnumerable<IEnumerable<uint>> Chunks)
-    {
-        uint chunkNum = 0;
-        foreach (var chunk in Chunks)
-        {
-            var graphFile = Path.Combine(ImagesDir, string.Format("chunk{0}.mg", chunkNum));
-            var graph = new PipelineJson(2720.44015, 3840, 2160, Images(ImagesDir, chunk),
-                        "/home/boris/Meshroom-2019.1.0/aliceVision/share/aliceVision/cameraSensors.db",
-                        "/home/boris/Meshroom-2019.1.0/aliceVision/share/aliceVision/vlfeat_K80L3.SIFT.tree"
-            );
-            graph.WriteToFile(graphFile);
-
-            chunkNum += 1;
-        }
-    }
 
     static void SplitProgress(float done)
     {
-Console.WriteLine("split done {0}", done);
+Console.WriteLine($"split {done}");
+    }
+
+    static void MeshroomProgress(string chunkName, float done)
+    {
+Console.WriteLine($"chunk {chunkName} {done}");
     }
 
     static void Main(string[] args)
@@ -46,12 +26,16 @@ Console.WriteLine("video {0}", videoFile);
          uint NumFrames;
          string ImagesDir;
          PrepVideo.SplitFrames(ffmpegBin, videoFile, SplitProgress, out NumFrames, out ImagesDir);
-//  Console.WriteLine("done spliting hairs, {0} NumFrames", NumFrames);
-//         PrepVideo.ExtractSubtitles(ffmpegBin, videoFile);
+Console.WriteLine("done spliting hairs, {0} NumFrames", NumFrames);
+        PrepVideo.ExtractSubtitles(ffmpegBin, videoFile);
 
-//        NumFrames = 2157u;
-//        ImagesDir = "/home/boris/droneMov/panopt/falafel_low";
-        MakeMeshroomGraphs(ImagesDir, Chunks.GetChunks(timeBase, NumFrames));
+//        NumFrames = 1499u;
+//        ImagesDir = "/home/boris/droneMov/panopt/valkarra_sunny";
+        MeshroomCompute.PhotogrammImages(
+            "/home/boris/Meshroom-2019.1.0/meshroom_compute",
+            "/home/boris/Meshroom-2019.1.0/aliceVision/share/aliceVision/cameraSensors.db",
+            "/home/boris/Meshroom-2019.1.0/aliceVision/share/aliceVision/vlfeat_K80L3.SIFT.tree",
+            ImagesDir, timeBase, NumFrames, MeshroomProgress);
     }
 }
 
